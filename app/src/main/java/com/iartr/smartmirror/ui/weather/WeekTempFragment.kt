@@ -24,17 +24,6 @@ class WeekTempFragment: Fragment(), WeekAdapter.Listener {
     private val adapter = WeekAdapter(this)
 
     private val viewModel: WeatherViewModel by activityViewModels()
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import androidx.fragment.app.Fragment
-import com.iartr.smartmirror.R
-
-class WeekTempFragment: Fragment() {
-
-    private lateinit var dayButton: Button
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -89,11 +78,6 @@ class WeekTempFragment: Fragment() {
             {})
         queue.add(stringRequest)
     }
-
-        dayButton = view.findViewById(R.id.dayButton)
-        dayButton.setOnClickListener { openDay() }
-    }
-
     companion object{
         @JvmStatic
         fun newInstance() = WeekTempFragment()
@@ -106,11 +90,5 @@ class WeekTempFragment: Fragment() {
         viewModel.avgHumidity.value = weekTemp.humidity
         viewModel.avgWindSpeed.value = weekTemp.windSpeed
         viewModel.avgTemp.value = weekTemp.avgTemp
-    private fun openDay() {
-        activity?.supportFragmentManager
-            ?.beginTransaction()
-            ?.addToBackStack(null)
-            ?.replace(R.id.placeholder, DayTempFragment.newInstance())
-            ?.commit()
     }
 }

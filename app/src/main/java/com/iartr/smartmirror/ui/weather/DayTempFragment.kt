@@ -1,15 +1,11 @@
 package com.iartr.smartmirror.ui.weather
 
-<<<<<<< HEAD
 import android.annotation.SuppressLint
-=======
->>>>>>> cb12571 (Switching Between Fragments)
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-<<<<<<< HEAD
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -29,18 +25,6 @@ class DayTempFragment : Fragment() {
     private val adapter = DayAdapter()
 
     private val viewModel: WeatherViewModel by activityViewModels()
-=======
-import android.widget.Button
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import com.iartr.smartmirror.R
-import com.iartr.smartmirror.ui.account.AccountFragment
-import kotlin.concurrent.fixedRateTimer
-
-class DayTempFragment : Fragment() {
-
-    private lateinit var weekButton: Button
->>>>>>> cb12571 (Switching Between Fragments)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,7 +36,6 @@ class DayTempFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-<<<<<<< HEAD
 
         recyclerView = view.findViewById(R.id.dayView)
         recyclerView.layoutManager = LinearLayoutManager(this.requireContext())
@@ -96,25 +79,10 @@ class DayTempFragment : Fragment() {
             },
             {})
         queue.add(stringRequest)
-=======
-        weekButton = view.findViewById(R.id.weekButton)
-        weekButton.setOnClickListener { openWeek() }
->>>>>>> cb12571 (Switching Between Fragments)
     }
 
     companion object{
         @JvmStatic
         fun newInstance() = DayTempFragment()
     }
-<<<<<<< HEAD
-=======
-
-    private fun openWeek() {
-        activity?.supportFragmentManager
-            ?.beginTransaction()
-            ?.addToBackStack(null)
-            ?.replace(R.id.placeholder, WeekTempFragment.newInstance())
-            ?.commit()
-    }
->>>>>>> cb12571 (Switching Between Fragments)
 }
