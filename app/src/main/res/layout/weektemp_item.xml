@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
 
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
@@ -12,9 +13,9 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
-        android:elevation="1dp"
-        app:cardBackgroundColor="@android:color/transparent"
+        app:cardBackgroundColor="#4D8E9195"
         app:cardCornerRadius="5dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,8 +61,7 @@
                     android:shadowDx="1"
                     android:shadowDy="1"
                     android:shadowRadius="1"
-                    android:text="TextView"
-                    android:textColor="#4D000000"
+                    android:textColor="@color/black"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -101,8 +101,8 @@
                     android:shadowDx="1"
                     android:shadowDy="1"
                     android:shadowRadius="1"
-                    android:text="TextView"
-                    android:textColor="#4D000000"
+                    tools:text="TextView"
+                    android:textColor="@color/black"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>

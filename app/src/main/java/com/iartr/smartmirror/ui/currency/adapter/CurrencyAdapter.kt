@@ -29,11 +29,13 @@ class CurrencyAdapter : RecyclerView.Adapter<CurrencyAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        private val tvCode: TextView = itemView.findViewById(R.id.tvCode)
         private val tvName: TextView = itemView.findViewById(R.id.tvName)
         private val tvValue: TextView = itemView.findViewById(R.id.tvValue)
 
         fun bind(item: CurrencyRate) {
-            tvName.text = String.format("%s: %s", item.currency.name, item.currency.description)
+            tvCode.text = item.currency.name
+            tvName.text = item.currency.description
             tvValue.text = String.format("%.4f", item.rate)
         }
     }

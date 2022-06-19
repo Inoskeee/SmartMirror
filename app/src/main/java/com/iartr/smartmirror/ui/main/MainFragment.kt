@@ -49,6 +49,7 @@ import com.iartr.smartmirror.toggles.*
 import com.iartr.smartmirror.ui.account.AccountFragment
 import com.iartr.smartmirror.ui.debug.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
+import com.iartr.smartmirror.ui.currency.main.CurrencyFragment
 import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.ui.weather.WeatherFragment
 import com.iartr.smartmirror.utils.RetryingErrorView
@@ -216,6 +217,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         rubToEur = view.findViewById(R.id.main_rub_to_eur_currency)
         currencyLoader = view.findViewById(R.id.main_currency_container_loader)
         currencyError = view.findViewById(R.id.main_currency_container_error)
+        //currencyList.apply { setOnClickListener { openCurrencyList() } }
+        currencyList.setOnClickListener { openCurrencyList() }
 
         articlesContainer = view.findViewById(R.id.main_articles_container)
         articlesList = view.findViewById(R.id.main_articles_list)
@@ -244,7 +247,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         viewModel.articlesState.subscribeWithFragment(::applyArticlesState)
         viewModel.cameraState.subscribeWithFragment(::applyCameraState)
 
-        weatherContainer.apply { setOnClickListener { openWeather() } }
+        //weatherContainer.apply { setOnClickListener { openWeather() } }
+        weatherContainer.setOnClickListener { openWeather() }
     }
 
     override fun onDestroyView() {

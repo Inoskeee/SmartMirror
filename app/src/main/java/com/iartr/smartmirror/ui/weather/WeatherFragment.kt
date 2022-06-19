@@ -2,6 +2,7 @@ package com.iartr.smartmirror.ui.weather
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
@@ -37,6 +38,8 @@ import java.util.*
 
 
 const val API_KEY = "7a2188082c6e48668f3181748220706"
+const val PREF_CITY = "CITY"
+const val PREF_SHARED = "PREF"
 
 class WeatherFragment : Fragment() {
 
@@ -56,6 +59,7 @@ class WeatherFragment : Fragment() {
     private lateinit var tabLayout: TabLayout
     private lateinit var pages: ViewPager2
 
+    private lateinit var sharedPreferences: SharedPreferences
 
     private val viewModel: WeatherViewModel by activityViewModels()
 
@@ -82,25 +86,34 @@ class WeatherFragment : Fragment() {
         humidity = view.findViewById(R.id.humidity)
         windSpeed = view.findViewById(R.id.windSpeed)
 
-        currentCity = ""
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.requireActivity())
-        if(!checkPermission()){
+        sharedPreferences =
+            requireActivity().getSharedPreferences(PREF_SHARED, Context.MODE_PRIVATE)
+
+        currentCity = sharedPreferences.getString(PREF_CITY, "") ?: ""
+
+        if(currentCity.isNotEmpty()) searchCity(currentCity)
+
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(this.requireActivity())
+        if (!checkPermission()) {
             requestPermission()
-        }
-        else{
+        } else {
             getLastLocation()
         }
 
         pages.adapter = PagerAdapter(this)
         TabLayoutMediator(tabLayout, pages) { tab, index ->
-            tab.text = when(index) {
+            tab.text = when (index) {
                 1 -> getString(R.string.week)
                 else -> getString(R.string.day)
             }
         }.attach()
 
         tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {undoChanges()}
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                undoChanges()
+            }
+
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
@@ -109,35 +122,38 @@ class WeatherFragment : Fragment() {
             searchCity(editCity.text.toString())
         }
 
-        viewModel.getCurrentWeather().observe(this.viewLifecycleOwner) { (it+"\u00B0").also { currTemp.text = it } }
+        viewModel.getCurrentWeather()
+            .observe(this.viewLifecycleOwner) { (it + "\u00B0").also { currTemp.text = it } }
         viewModel.getCurrentCity().observe(this.viewLifecycleOwner) { currCity.text = it }
         viewModel.getCurrentInfo().observe(this.viewLifecycleOwner) { infoView.text = it }
         viewModel.getCurrentWind().observe(this.viewLifecycleOwner) { windSpeed.text = it }
         viewModel.getCurrentHumidity().observe(this.viewLifecycleOwner) { humidity.text = it }
         viewModel.getCurrentUpdate().observe(this.viewLifecycleOwner) { currLocalTime.text = it }
-        viewModel.getCurrentIcon().observe(this.viewLifecycleOwner){
+        viewModel.getCurrentIcon().observe(this.viewLifecycleOwner) {
             Log.d("WLog", it)
-            Picasso.get().load("https:"+it).error(R.drawable.iconholder).into(iconView)
+            Picasso.get().load("https:" + it).error(R.drawable.iconholder).into(iconView)
         }
 
-        viewModel.getAvgTemp().observe(this.viewLifecycleOwner) { (it+"\u00B0").also { currTemp.text = it } }
+        viewModel.getAvgTemp()
+            .observe(this.viewLifecycleOwner) { (it + "\u00B0").also { currTemp.text = it } }
         viewModel.getAvgInfo().observe(this.viewLifecycleOwner) { infoView.text = it }
         viewModel.getAvgWind().observe(this.viewLifecycleOwner) { windSpeed.text = it }
         viewModel.getAvgHumidity().observe(this.viewLifecycleOwner) { humidity.text = it }
         viewModel.getAvgTime().observe(this.viewLifecycleOwner) { currLocalTime.text = it }
-        viewModel.getAvgIcon().observe(this.viewLifecycleOwner){
+        viewModel.getAvgIcon().observe(this.viewLifecycleOwner) {
             Log.d("WLog", it)
-            Picasso.get().load("https:"+it).error(R.drawable.iconholder).into(iconView)
+            Picasso.get().load("https:" + it).error(R.drawable.iconholder).into(iconView)
         }
     }
 
-    fun undoChanges(){
+    fun undoChanges() {
         (viewModel.currentTemp.value + "\u00B0").also { currTemp.text = it }
         humidity.text = viewModel.currentHumidity.value
         infoView.text = viewModel.currentInfo.value
         windSpeed.text = viewModel.currentWindSpeed.value
         currLocalTime.text = viewModel.currentTime.value
-        Picasso.get().load("https:"+viewModel.currentIcon.value).error(R.drawable.iconholder).into(iconView)
+        Picasso.get().load("https:" + viewModel.currentIcon.value).error(R.drawable.iconholder)
+            .into(iconView)
 
     }
 
@@ -154,8 +170,10 @@ class WeatherFragment : Fragment() {
                 val temp = obj.getJSONObject("current").getString("temp_c")
                 val city = obj.getJSONObject("location").getString("name")
                 val updateTime = obj.getJSONObject("location").getString("localtime")
-                val urlIcon = obj.getJSONObject("current").getJSONObject("condition").getString("icon")
-                val information = obj.getJSONObject("current").getJSONObject("condition").getString("text")
+                val urlIcon =
+                    obj.getJSONObject("current").getJSONObject("condition").getString("icon")
+                val information =
+                    obj.getJSONObject("current").getJSONObject("condition").getString("text")
                 val wind = obj.getJSONObject("current").getString("wind_mph")
                 val hum = obj.getJSONObject("current").getString("humidity")
 
@@ -166,9 +184,17 @@ class WeatherFragment : Fragment() {
                 viewModel.currentInfo.value = information
                 viewModel.currentWindSpeed.value = wind
                 viewModel.currentHumidity.value = hum
+
+                val editor = sharedPreferences.edit()
+                editor.putString(PREF_CITY, name)
+                editor.apply()
             },
             {
-                Toast.makeText(this.requireContext(), getString(R.string.cityNotFound), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this.requireContext(),
+                    getString(R.string.cityNotFound),
+                    Toast.LENGTH_SHORT
+                ).show()
             })
         queue.add(stringRequest)
     }
@@ -193,7 +219,9 @@ class WeatherFragment : Fragment() {
         requestMultiplePermissions.launch(
             arrayOf(
                 android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION))
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
     private fun isLocationEnabled(): Boolean {
@@ -206,12 +234,13 @@ class WeatherFragment : Fragment() {
     }
 
 
-    val requestMultiplePermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        permissions.entries.forEach {
-            Log.e("DEBUG", "${it.key} = ${it.value}")
-            getLastLocation()
+    val requestMultiplePermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                Log.e("DEBUG", "${it.key} = ${it.value}")
+                getLastLocation()
+            }
         }
-    }
 
     private fun getLastLocation() {
         if (checkPermission()) {
@@ -248,14 +277,18 @@ class WeatherFragment : Fragment() {
 
     private fun searchCity(city: String) {
         if (city.isEmpty()) {
-            Toast.makeText(this.requireContext(), getString(R.string.enterCityName), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this.requireContext(),
+                getString(R.string.enterCityName),
+                Toast.LENGTH_SHORT
+            ).show()
         } else {
             getCurrentResult(city)
             currentCity = city
         }
     }
 
-    companion object{
+    companion object {
         @JvmStatic
         fun newInstance() = WeatherFragment()
     }
